@@ -67,7 +67,9 @@ function StockEditor({
     String(Math.round(stock?.['Campus A']?.water ?? 0))
   );
 
-  const currentStock = Number(stock?.[campus]?.[resource] ?? 0);
+const currentStock = Math.round(
+  Number(stock?.[campus]?.[resource] ?? 0)
+);
 
   const getResourceStatus = (amount) => {
     if (amount < 50) {
@@ -3353,8 +3355,13 @@ table(
                       getCampusStatus(
                         campus
                       );
-                      const waterStock = Number(stock?.[campus]?.water ?? 0);
-const medicineStock = Number(stock?.[campus]?.medicine ?? 0);
+                      const waterStock = Math.round(
+  Number(stock?.[campus]?.water ?? 0)
+);
+
+const medicineStock = Math.round(
+  Number(stock?.[campus]?.medicine ?? 0)
+);
 
 const waterStatus = getResourceStatus(waterStock);
 const medicineStatus = getResourceStatus(medicineStock);
