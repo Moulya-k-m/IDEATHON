@@ -27,6 +27,33 @@ import {
    STOCK EDITOR
 ========================================================= */
 
+
+function getResourceStatus(stockValue) {
+  const amount = Number(stockValue) || 0;
+
+  if (amount < 50) {
+    return {
+      label: "CRITICAL",
+      color: "bg-rose-100 text-rose-700",
+      recommendation: "Immediate emergency supply required"
+    };
+  }
+
+  if (amount < 100) {
+    return {
+      label: "LOW RESOURCE",
+      color: "bg-amber-100 text-amber-700",
+      recommendation: "Request additional supplies"
+    };
+  }
+
+  return {
+    label: "AVAILABLE",
+    color: "bg-emerald-100 text-emerald-700",
+    recommendation: "Stock sufficient"
+  };
+}
+
 function StockEditor({
   stock,
   setStock,
@@ -40,13 +67,37 @@ function StockEditor({
     String(Math.round(stock?.['Campus A']?.water ?? 0))
   );
 
+  const currentStock = Number(stock?.[campus]?.[resource] ?? 0);
+
+  const getResourceStatus = (amount) => {
+    if (amount < 50) {
+      return {
+        label: "CRITICAL",
+        color: "bg-rose-100 text-rose-700",
+        recommendation: "Immediate emergency supply required"
+      };
+    }
+
+    if (amount < 100) {
+      return {
+        label: "LOW RESOURCE",
+        color: "bg-amber-100 text-amber-700",
+        recommendation: "Request additional supplies"
+      };
+    }
+
+    return {
+      label: "AVAILABLE",
+      color: "bg-emerald-100 text-emerald-700",
+      recommendation: "Stock sufficient"
+    };
+  };
+
+  const resourceStatus = getResourceStatus(currentStock);
+
   useEffect(() => {
     setValue(
-      String(
-        Math.round(
-          stock?.[campus]?.[resource] ?? 0
-        )
-      )
+      String(Math.round(stock?.[campus]?.[resource] ?? 0))
     );
   }, [campus, resource, stock]);
 
@@ -124,11 +175,19 @@ function StockEditor({
         </p>
 
         <p className="text-xl font-bold text-blue-800 mt-1">
-          {Math.round(stock?.[campus]?.[resource] ?? 0)}
+          {currentStock}
         </p>
 
         <p className="text-[10px] text-blue-600 mt-1">
           {resource === 'water' ? 'Litres' : 'Units'}
+        </p>
+
+        <span className={`inline-block mt-2 px-2 py-1 rounded-full text-[10px] font-bold ${resourceStatus.color}`}>
+          {resourceStatus.label}
+        </span>
+
+        <p className="text-xs font-medium mt-2 text-slate-700">
+          {resourceStatus.recommendation}
         </p>
       </div>
 
@@ -143,6 +202,7 @@ function StockEditor({
     </div>
   );
 }
+
 
 /* =========================================================
    CONSTANTS
@@ -984,18 +1044,38 @@ export default function ResQFlowApp() {
     ) {
       return 0;
     }
-
-    return Math.min(
-      100,
-      Math.max(
-        0,
-        (current /
-          reserve) *
-          100
-      )
-    );
-
+return Math.min(
+  100,
+  Math.max(
+    0,
+    (current / reserve) * 100
+  )
+);
   };
+
+  const getResourceStatus = (amount) => {
+  if (amount < 50) {
+    return {
+      label: "CRITICAL",
+      color: "bg-rose-100 text-rose-700",
+      recommendation: "Immediate emergency supply required"
+    };
+  }
+
+  if (amount < 100) {
+    return {
+      label: "LOW RESOURCE",
+      color: "bg-amber-100 text-amber-700",
+      recommendation: "Request additional supplies"
+    };
+  }
+
+  return {
+    label: "AVAILABLE",
+    color: "bg-emerald-100 text-emerald-700",
+    recommendation: "Stock sufficient"
+  };
+};
 
   const getCampusStatus =
     (campus) => {
@@ -3273,6 +3353,11 @@ table(
                       getCampusStatus(
                         campus
                       );
+                      const waterStock = Number(stock?.[campus]?.water ?? 0);
+const medicineStock = Number(stock?.[campus]?.medicine ?? 0);
+
+const waterStatus = getResourceStatus(waterStock);
+const medicineStatus = getResourceStatus(medicineStock);
 
                     const waterHours =
                       getCampusHours(
@@ -3363,6 +3448,9 @@ table(
 
                             <span className="text-xs font-normal text-slate-500">
                               {' '}hours left
+                              <span className={`text-[9px] font-bold px-2 py-1 rounded-full ${waterStatus.color}`}>
+  {waterStatus.label}
+</span>
                             </span>
 
                           </div>
@@ -3417,6 +3505,9 @@ table(
 
                             <span className="text-xs font-normal text-slate-500">
                               {' '}hours left
+                              <span className={`text-[9px] font-bold px-2 py-1 rounded-full ${medicineStatus.color}`}>
+  {medicineStatus.label}
+</span>
                             </span>
 
                           </div>
